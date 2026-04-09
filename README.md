@@ -20,6 +20,12 @@ It detects and recognizes faces in real-time using a webcam and automatically ma
 - OpenCV
 - NumPy
 
+## 🖥️ GUI Features
+- Start Camera button
+- Live webcam display inside window
+- Real-time face recognition with name
+- Exit button for safe close
+
 ---
 
 ## ▶️ How to Run
