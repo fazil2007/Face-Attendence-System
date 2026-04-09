@@ -1,16 +1,17 @@
-# 🎯 Face Attendance System
+# 🎯 Face Recognition Attendance System
 
 ## 📌 Description
-This project is a Face Detection Attendance System built using Python and OpenCV.  
-It detects human faces in real-time using a webcam and automatically marks attendance in a CSV file.
+This project is a Face Recognition Attendance System built using Python and OpenCV.  
+It detects and recognizes faces in real-time using a webcam and automatically marks attendance with the person's name.
 
 ---
 
 ## 🚀 Features
 - 🎥 Real-time face detection
-- 📝 Automatic attendance marking
+- 🧠 Face recognition (identifies person)
+- 📝 Automatic attendance with name
 - 📁 Stores data in CSV file
-- ⚡ Simple and fast system
+- ⚡ Fast and efficient
 
 ---
 
@@ -31,18 +32,20 @@ It detects human faces in real-time using a webcam and automatically marks atten
 ---
 
 ## 📊 Output
-- Detects faces using webcam
-- Displays "Face Detected"
-- Saves attendance in `attendance.csv`
+- Detects and recognizes faces
+- Displays person's name on screen
+- Saves attendance with name and time in `attendance.csv`
 
 ---
 
 ## 📷 Future Improvements
-- Add face recognition (identify person name)
 - Add GUI interface
-- Store data in database
+- Store data in database (MySQL)
+- Improve accuracy with deep learning
 
 ---
 
 ## 👨‍💻 Author
 Fazil
+
+
