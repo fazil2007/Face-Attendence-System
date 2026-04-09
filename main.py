@@ -2,9 +2,14 @@ import cv2
 import numpy as np
 import os
 from datetime import datetime
+import tkinter as tk
+from tkinter import messagebox
+from PIL import Image, ImageTk
 
 # Load face detector
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier(
+    cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+)
 
 # Prepare training data
 path = 'images'
@@ -27,7 +32,6 @@ for file in os.listdir(path):
     names[label_id] = os.path.splitext(file)[0]
     label_id += 1
 
-# Train model
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 recognizer.train(faces, np.array(labels))
 
@@ -38,37 +42,58 @@ def markAttendance(name):
         dt = now.strftime('%H:%M:%S')
         f.write(f"{name},{dt}\n")
 
-# Webcam
-cap = cv2.VideoCapture(0)
+# GUI Setup
+root = tk.Tk()
+root.title("Face Recognition Attendance System")
+root.geometry("800x600")
 
+label = tk.Label(root)
+label.pack()
+
+cap = cv2.VideoCapture(0)
 marked = set()
 
-while True:
-    ret, frame = cap.read()
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+def start_camera():
+    def update_frame():
+        ret, frame = cap.read()
+        if ret:
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            faces_rect = face_cascade.detectMultiScale(gray, 1.3, 5)
 
-    faces_rect = face_cascade.detectMultiScale(gray, 1.3, 5)
+            for (x, y, w, h) in faces_rect:
+                face_roi = gray[y:y+h, x:x+w]
+                label_id, confidence = recognizer.predict(face_roi)
 
-    for (x, y, w, h) in faces_rect:
-        face_roi = gray[y:y+h, x:x+w]
+                name = names[label_id]
 
-        label, confidence = recognizer.predict(face_roi)
+                cv2.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), 2)
+                cv2.putText(frame, name, (x, y-10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8,
+                            (255,255,255), 2)
 
-        name = names[label]
+                if name not in marked:
+                    markAttendance(name)
+                    marked.add(name)
 
-        cv2.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), 2)
-        cv2.putText(frame, name, (x, y-10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8,
-                    (255,255,255), 2)
+            img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(img)
+            imgtk = ImageTk.PhotoImage(image=img)
+            label.imgtk = imgtk
+            label.configure(image=imgtk)
 
-        if name not in marked:
-            markAttendance(name)
-            marked.add(name)
+        label.after(10, update_frame)
 
-    cv2.imshow("Face Recognition Attendance", frame)
+    update_frame()
 
-    if cv2.waitKey(1) == 13:
-        break
+def exit_app():
+    cap.release()
+    root.destroy()
 
-cap.release()
-cv2.destroyAllWindows()
+# Buttons
+btn_start = tk.Button(root, text="Start Camera", command=start_camera, font=("Arial", 14))
+btn_start.pack(pady=10)
+
+btn_exit = tk.Button(root, text="Exit", command=exit_app, font=("Arial", 14))
+btn_exit.pack(pady=10)
+
+root.mainloop()
